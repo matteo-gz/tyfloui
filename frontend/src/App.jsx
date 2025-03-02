@@ -63,14 +63,14 @@ function App() {
         localStorage.setItem('sshConfig', JSON.stringify(newFormData));
     };
 
-    function handleConnect() {
-        // TODO: 实现连接逻辑
-        console.log('连接配置:', formData);
-    }
-
     function handleToggle(action) {
-        // TODO: 实现开启/关闭逻辑
-        console.log(action, '配置:', formData);
+        const newFormData = {
+            ...formData,
+            isOpen: action === '开启'
+        };
+        setFormData(newFormData);
+        localStorage.setItem('sshConfig', JSON.stringify(newFormData));
+        console.log(action, '配置:', newFormData);
     }
 
     return (
@@ -161,7 +161,17 @@ function App() {
                          <button className="btn" onClick={() => handleToggle('关闭')}>关闭</button>
                      </div>
                  </div>
-                 <button className="btn connect-btn" onClick={handleConnect}>连接</button>
+                 <div className="status-display">
+                     <div className="status-indicator">
+                         <div className={`status-dot ${formData.isOpen ? 'active' : ''}`}></div>
+                         <span>{formData.isOpen ? '已开启' : '已关闭'}</span>
+                     </div>
+                     {formData.isOpen && formData.socks5Port && (
+                         <div className="port-number active">
+                             SOCKS5端口: {formData.socks5Port}
+                         </div>
+                     )}
+                 </div>
             </div>
         </div>
     )

@@ -128,3 +128,39 @@
     margin-top: 20px !important;
     width: auto !important;
 }
+
+.status-display {
+    margin-left: 160px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.status-dot.active {
+    background-color: #4caf50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+.port-number {
+    color: #666;
+    font-size: 14px;
+}
+
+.port-number.active {
+    color: #f44336;
+    font-weight: bold;
+}
