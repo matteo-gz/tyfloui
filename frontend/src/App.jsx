@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import './App.css';
-import {Greet} from "../wailsjs/go/main/App";
+import {StartProxy, StopProxy} from "../wailsjs/go/main/App";
 
 function App() {
     const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ function App() {
     });
     const [sshKeyFileName, setSshKeyFileName] = useState('');
 
-    // 组件加载时从 localStorage 加载数据
+    // 组件加载时从 localStorage 加载数据并获取当前状态
     useEffect(() => {
         const savedData = localStorage.getItem('sshConfig');
         if (savedData) {
@@ -21,7 +21,21 @@ function App() {
             setFormData(parsedData);
             setSshKeyFileName(parsedData.sshKeyFileName || '');
         }
+        
+        // 获取当前状态
+        updateStatus();
     }, []);
+
+    // 定期更新状态
+    useEffect(() => {
+        const timer = setInterval(updateStatus, 2000); // 每2秒更新一次状态
+        return () => clearInterval(timer);
+    }, []);
+
+    // 更新状态的函数
+    const updateStatus = async () => {
+        
+    };
 
     // 处理文件选择
     const handleFileSelect = async (e) => {
@@ -63,14 +77,25 @@ function App() {
         localStorage.setItem('sshConfig', JSON.stringify(newFormData));
     };
 
-    function handleToggle(action) {
-        const newFormData = {
-            ...formData,
-            isOpen: action === '开启'
-        };
-        setFormData(newFormData);
-        localStorage.setItem('sshConfig', JSON.stringify(newFormData));
-        console.log(action, '配置:', newFormData);
+    async function handleToggle(action) {
+        try {
+            if (action === '开启') {
+                let result = await StartProxy({
+                    sshKey: formData.sshKey,
+                    sshHost: formData.sshHost,
+                    sshPort: parseInt(formData.sshPort),
+                    sshUser: formData.sshUser,
+                    socks5Port: parseInt(formData.socks5Port)
+                });
+                console.log(result);
+            } else {
+                await StopProxy();
+            }
+            // 更新状态
+            await updateStatus();
+        } catch (error) {
+            console.error('操作失败:', error);
+        }
     }
 
     return (
