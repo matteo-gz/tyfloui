@@ -30,32 +30,55 @@ func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
-func (a *App) StartProxy(file string, host string, port int, user string, socks5Port int) (ok bool, message string) {
+type Test1Result struct {
+	Ok      bool
+	Message string
+}
+
+func (a *App) Test1() Test1Result {
+	return Test1Result{Ok: true, Message: "success"}
+}
+
+type StartProxyResult struct {
+	Ok      bool
+	Message string
+}
+
+func (a *App) StartProxy(file string, host string, port int, user string, socks5Port int) StartProxyResult {
+	if a.sshTunnel != nil {
+		a.StopProxy()
+		log.Println("ssh隧道已启动，先关闭")
+	}
 	a.sshTunnel = tunnel.NewSshTunnel()
-	err := a.sshTunnel.Connect(file, user, host, port)
+	err := a.sshTunnel.ConnectByPrivateKey(file, user, host, port)
 	if err != nil {
 		log.Println("ssh连接失败", err)
-		return false, err.Error()
+		return StartProxyResult{Ok: false, Message: err.Error()}
 	}
 	err = a.sshTunnel.Start(socks5Port)
 	if err != nil {
 		log.Println("ssh隧道启动失败", err)
-		return false, err.Error()
+		return StartProxyResult{Ok: false, Message: err.Error()}
 	}
 	log.Println("ssh隧道启动成功")
-	return true, "success"
+	return StartProxyResult{Ok: true, Message: "success"}
 }
 
-func (a *App) StopProxy() (ok bool, message string) {
+type StopProxyResult struct {
+	Ok      bool
+	Message string
+}
+
+func (a *App) StopProxy() StopProxyResult {
 	if a.sshTunnel == nil {
 		log.Println("sshTunnel is nil")
-		return false, "sshTunnel is nil"
+		return StopProxyResult{Ok: false, Message: "sshTunnel is nil"}
 	}
 	err := a.sshTunnel.Close()
 	if err != nil {
 		log.Println("ssh隧道关闭失败", err)
-		return false, err.Error()
+		return StopProxyResult{Ok: false, Message: err.Error()}
 	}
 	log.Println("ssh隧道关闭成功")
-	return true, "success"
+	return StopProxyResult{Ok: true, Message: "success"}
 }

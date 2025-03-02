@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import './App.css';
-import {StartProxy, StopProxy} from "../wailsjs/go/main/App";
+import {StartProxy, StopProxy,Test1} from "../wailsjs/go/main/App";
 
 function App() {
     const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ function App() {
         isOpen: false
     });
     const [sshKeyFileName, setSshKeyFileName] = useState('');
+    const [tip, setTip] = useState('');
 
     // 组件加载时从 localStorage 加载数据并获取当前状态
     useEffect(() => {
@@ -78,29 +79,41 @@ function App() {
     };
 
     async function handleToggle(action) {
+        console.log("action",action);
         try {
             if (action === '开启') {
-                let result = await StartProxy({
-                    sshKey: formData.sshKey,
-                    sshHost: formData.sshHost,
-                    sshPort: parseInt(formData.sshPort),
-                    sshUser: formData.sshUser,
-                    socks5Port: parseInt(formData.socks5Port)
-                });
-                console.log(result);
+                let result = await StartProxy(
+                    formData.sshKey,
+                    formData.sshHost,
+                    parseInt(formData.sshPort),
+                    formData.sshUser,
+                    parseInt(formData.socks5Port)
+                );
+                setTip(result.Message);
+                if (result.Ok) {
+                    setFormData(prev => ({ ...prev, isOpen: true }));
+                }
             } else {
-                await StopProxy();
+                let result = await StopProxy();
+                setTip(result.Message);
+                if (result.Ok) {
+                    setFormData(prev => ({ ...prev, isOpen: false }));
+                }
             }
-            // 更新状态
-            await updateStatus();
         } catch (error) {
-            console.error('操作失败:', error);
+            setTip(error.message);
+            console.log("error",error);
         }
     }
 
     return (
         <div id="App">
             <div id="input" className="input-box">
+                {tip && (
+                    <div className="tip-message">
+                        {tip}
+                    </div>
+                )}
                  <div className="form-group">
                      <label>SSH私钥:</label>
                      <div className="file-input-container">

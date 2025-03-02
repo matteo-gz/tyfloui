@@ -13,3 +13,7 @@ export function StartProxy(arg1, arg2, arg3, arg4, arg5) {
 export function StopProxy() {
   return window['go']['main']['App']['StopProxy']();
 }
+
+export function Test1() {
+  return window['go']['main']['App']['Test1']();
+}
