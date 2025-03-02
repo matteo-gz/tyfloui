@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import './App.css';
-import {StartProxy, StopProxy,Test1} from "../wailsjs/go/main/App";
+import {StartProxy, StopProxy,Test1,GetStatus} from "../wailsjs/go/main/App";
 
 function App() {
     const [formData, setFormData] = useState({
@@ -16,9 +16,11 @@ function App() {
 
     // 组件加载时从 localStorage 加载数据并获取当前状态
     useEffect(() => {
+        console.log("hello world");
         const savedData = localStorage.getItem('sshConfig');
         if (savedData) {
             const parsedData = JSON.parse(savedData);
+            // parsedData.isOpen=false;
             setFormData(parsedData);
             setSshKeyFileName(parsedData.sshKeyFileName || '');
         }
@@ -36,6 +38,9 @@ function App() {
     // 更新状态的函数
     const updateStatus = async () => {
         
+        const status = await GetStatus();
+        console.log("updateStatus",status);
+        setFormData(prev => ({ ...prev, isOpen: status }));
     };
 
     // 处理文件选择

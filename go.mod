@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.23.4
 
 require (
-	github.com/matteo-gz/tyflo v1.1.6
+	github.com/matteo-gz/tyflo v1.1.7
 	github.com/wailsapp/wails/v2 v2.9.2
 )
 
